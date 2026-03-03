@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAuth } from "@/lib/auth";
-import type { ReportData, CategoryBreakdown, PaymentMethodBreakdown, VendorBreakdown } from "@/lib/types";
+import type { ReportData, CategoryBreakdown, PaymentMethodBreakdown, VendorBreakdown, DayBreakdown, DayExpenseItem } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth();
@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
       by_category: [],
       by_payment_method: [],
       top_vendors: [],
+      by_day: [],
     };
     return NextResponse.json(report);
   }
@@ -76,6 +77,16 @@ export async function GET(request: NextRequest) {
     vendorMap.set(e.vendor, existing);
   }
 
+  // By day
+  const dayMap = new Map<string, DayBreakdown>();
+  for (const e of expenses) {
+    const existing = dayMap.get(e.date) || { date: e.date, total: 0, count: 0, items: [] as DayExpenseItem[] };
+    existing.total += Number(e.amount);
+    existing.count += 1;
+    existing.items.push({ vendor: e.vendor, amount: Number(e.amount) });
+    dayMap.set(e.date, existing);
+  }
+
   const report: ReportData = {
     month,
     total,
@@ -85,6 +96,7 @@ export async function GET(request: NextRequest) {
     top_vendors: Array.from(vendorMap.values())
       .sort((a, b) => b.total - a.total)
       .slice(0, 10),
+    by_day: Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date)),
   };
 
   return NextResponse.json(report);

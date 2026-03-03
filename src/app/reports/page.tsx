@@ -5,6 +5,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthPicker } from "@/components/reports/month-picker";
 import { SummaryCards } from "@/components/reports/summary-cards";
+import { ExpenseCalendar } from "@/components/reports/expense-calendar";
 import { CategoryChart } from "@/components/reports/category-chart";
 import { VendorTable } from "@/components/reports/vendor-table";
 import type { ReportData } from "@/lib/types";
@@ -69,6 +70,7 @@ export default function ReportsPage() {
       ) : report ? (
         <div className="space-y-6">
           <SummaryCards data={report} />
+          <ExpenseCalendar month={month} byDay={report.by_day} />
           <CategoryChart data={report.by_category} />
           <VendorTable data={report.top_vendors} />
         </div>

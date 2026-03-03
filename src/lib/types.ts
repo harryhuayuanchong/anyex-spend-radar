@@ -68,6 +68,7 @@ export interface ReportData {
   by_category: CategoryBreakdown[];
   by_payment_method: PaymentMethodBreakdown[];
   top_vendors: VendorBreakdown[];
+  by_day: DayBreakdown[];
 }
 
 export interface CategoryBreakdown {
@@ -88,4 +89,16 @@ export interface VendorBreakdown {
   vendor: string;
   total: number;
   count: number;
+}
+
+export interface DayExpenseItem {
+  vendor: string;
+  amount: number;
+}
+
+export interface DayBreakdown {
+  date: string;
+  total: number;
+  count: number;
+  items: DayExpenseItem[];
 }
