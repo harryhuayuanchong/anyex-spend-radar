@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireAuth } from "@/lib/auth";
 import { formatCurrency } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const month = request.nextUrl.searchParams.get("month");
   const format = request.nextUrl.searchParams.get("format") || "csv";
 
@@ -13,6 +18,7 @@ export async function GET(request: NextRequest) {
   const { data: expenses, error } = await supabase
     .from("expenses")
     .select("*, category:categories(name)")
+    .eq("user_id", userId)
     .eq("month", month)
     .order("date", { ascending: true });
 

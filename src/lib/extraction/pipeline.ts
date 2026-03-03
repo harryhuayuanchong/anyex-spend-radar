@@ -9,18 +9,20 @@ function isPdf(filename: string) {
   return filename.toLowerCase().endsWith(".pdf");
 }
 
-export async function processDocument(docId: string) {
+export async function processDocument(docId: string, userId: string) {
   // Mark as processing
   await supabase
     .from("documents")
     .update({ status: "processing", error_message: null })
-    .eq("id", docId);
+    .eq("id", docId)
+    .eq("user_id", userId);
 
   try {
     const { data: doc, error } = await supabase
       .from("documents")
       .select("*")
       .eq("id", docId)
+      .eq("user_id", userId)
       .single();
 
     if (error || !doc) throw new Error("Document not found");
@@ -58,11 +60,12 @@ export async function processDocument(docId: string) {
         extracted_text: extractedText,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", docId);
+      .eq("id", docId)
+      .eq("user_id", userId);
 
     // Auto-categorize and create expense
     try {
-      await categorizeAndPost(docId, validated);
+      await categorizeAndPost(docId, validated, userId);
     } catch (catErr) {
       // Log but don't fail the whole pipeline — extraction succeeded,
       // user can still manually categorize and post from Inbox
@@ -78,6 +81,7 @@ export async function processDocument(docId: string) {
         error_message: message,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", docId);
+      .eq("id", docId)
+      .eq("user_id", userId);
   }
 }

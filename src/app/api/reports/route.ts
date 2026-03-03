@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireAuth } from "@/lib/auth";
 import type { ReportData, CategoryBreakdown, PaymentMethodBreakdown, VendorBreakdown } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const month = request.nextUrl.searchParams.get("month");
   if (!month) {
     return NextResponse.json({ error: "month parameter required" }, { status: 400 });
@@ -12,6 +17,7 @@ export async function GET(request: NextRequest) {
   const { data: expenses, error } = await supabase
     .from("expenses")
     .select("*, category:categories(id, name, color)")
+    .eq("user_id", userId)
     .eq("month", month);
 
   if (error) {

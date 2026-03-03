@@ -6,6 +6,7 @@ export interface Category {
 
 export interface Document {
   id: string;
+  user_id: string;
   filename: string;
   file_url: string;
   source_type: string;
@@ -37,6 +38,7 @@ export interface LineItem {
 
 export interface Expense {
   id: string;
+  user_id: string;
   date: string;
   month: string;
   vendor: string;
@@ -54,6 +56,7 @@ export interface Expense {
 
 export interface MerchantRule {
   id: string;
+  user_id: string;
   vendor_pattern: string;
   category_id: string;
 }

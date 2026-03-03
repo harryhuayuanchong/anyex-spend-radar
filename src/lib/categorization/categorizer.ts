@@ -10,11 +10,13 @@ function getOpenAI() {
 }
 
 async function matchMerchantRule(
-  vendor: string
+  vendor: string,
+  userId: string
 ): Promise<string | null> {
   const { data: rules } = await supabase
     .from("merchant_rules")
-    .select("vendor_pattern, category_id");
+    .select("vendor_pattern, category_id")
+    .eq("user_id", userId);
 
   if (!rules) return null;
 
@@ -66,10 +68,11 @@ async function classifyWithAI(
 
 export async function categorizeAndPost(
   docId: string,
-  data: ExtractedData
+  data: ExtractedData,
+  userId: string
 ) {
   // 1. Try merchant rules
-  let categoryId = await matchMerchantRule(data.vendor);
+  let categoryId = await matchMerchantRule(data.vendor, userId);
 
   // 2. Fallback to AI classification
   if (!categoryId) {
@@ -79,6 +82,7 @@ export async function categorizeAndPost(
   // 3. Upsert expense (unique on source_document_id)
   const { error } = await supabase.from("expenses").upsert(
     {
+      user_id: userId,
       date: data.date,
       month: toMonth(data.date),
       vendor: data.vendor,
@@ -101,5 +105,6 @@ export async function categorizeAndPost(
   await supabase
     .from("documents")
     .update({ status: "posted", updated_at: new Date().toISOString() })
-    .eq("id", docId);
+    .eq("id", docId)
+    .eq("user_id", userId);
 }

@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const { data, error } = await supabase
     .from("documents")
     .select("*")
     .eq("id", params.id)
+    .eq("user_id", userId)
     .single();
 
   if (error) {
@@ -22,6 +28,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const body = await request.json();
 
   const { data, error } = await supabase
@@ -31,6 +41,7 @@ export async function PATCH(
       updated_at: new Date().toISOString(),
     })
     .eq("id", params.id)
+    .eq("user_id", userId)
     .select()
     .single();
 
@@ -45,12 +56,17 @@ export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const { id } = params;
 
   const { data: doc, error: fetchErr } = await supabase
     .from("documents")
     .select("file_url")
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
 
   if (fetchErr) {
@@ -64,7 +80,8 @@ export async function DELETE(
   const { error: delErr } = await supabase
     .from("documents")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (delErr) {
     return NextResponse.json({ error: delErr.message }, { status: 500 });

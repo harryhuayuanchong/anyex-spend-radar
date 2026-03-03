@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireAuth } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -12,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const storagePath = `${Date.now()}_${file.name}`;
+    const storagePath = `${userId}/${Date.now()}_${file.name}`;
 
     // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
@@ -37,6 +42,7 @@ export async function POST(request: Request) {
     const { data: doc, error: dbError } = await supabase
       .from("documents")
       .insert({
+        user_id: userId,
         filename: file.name,
         file_url: publicUrl,
         source_type: sourceType,

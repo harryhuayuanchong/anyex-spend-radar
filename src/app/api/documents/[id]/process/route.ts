@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireAuth } from "@/lib/auth";
 import { processDocument } from "@/lib/extraction/pipeline";
 import { categorizeAndPost } from "@/lib/categorization/categorizer";
 import type { ExtractedData } from "@/lib/types";
@@ -8,6 +9,10 @@ export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+  const { userId } = auth;
+
   const { id } = params;
 
   // Check if this is a manual save+post from the editor
@@ -25,6 +30,7 @@ export async function POST(
         .from("documents")
         .select("extracted_json")
         .eq("id", id)
+        .eq("user_id", userId)
         .single();
 
       if (!doc?.extracted_json) throw new Error("No extracted data");
@@ -34,8 +40,8 @@ export async function POST(
       // If a manual category + save_rule, create merchant rule
       if (body.category_id && body.save_rule) {
         await supabase.from("merchant_rules").upsert(
-          { vendor_pattern: extracted.vendor.toLowerCase(), category_id: body.category_id },
-          { onConflict: "vendor_pattern" }
+          { user_id: userId, vendor_pattern: extracted.vendor.toLowerCase(), category_id: body.category_id },
+          { onConflict: "user_id,vendor_pattern" }
         );
       }
 
@@ -44,6 +50,7 @@ export async function POST(
         const { toMonth } = await import("@/lib/utils");
         await supabase.from("expenses").upsert(
           {
+            user_id: userId,
             date: extracted.date,
             month: toMonth(extracted.date),
             vendor: extracted.vendor,
@@ -60,9 +67,10 @@ export async function POST(
         await supabase
           .from("documents")
           .update({ status: "posted", updated_at: new Date().toISOString() })
-          .eq("id", id);
+          .eq("id", id)
+          .eq("user_id", userId);
       } else {
-        await categorizeAndPost(id, extracted);
+        await categorizeAndPost(id, extracted, userId);
       }
     };
 
@@ -71,7 +79,7 @@ export async function POST(
     );
   } else {
     // Normal: full extraction pipeline
-    processDocument(id).catch((err) =>
+    processDocument(id, userId).catch((err) =>
       console.error("Background processing failed:", err)
     );
   }
