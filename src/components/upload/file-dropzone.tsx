@@ -39,7 +39,7 @@ export function FileDropzone({ onFiles }: FileDropzoneProps) {
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
       className={cn(
-        "flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-10 transition-colors",
+        "flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-6 sm:p-10 transition-colors",
         dragOver
           ? "border-blue-500 bg-blue-50"
           : "border-gray-300 hover:border-gray-400"

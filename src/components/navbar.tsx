@@ -3,15 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Upload, Inbox, BarChart3, LogOut, Loader2 } from "lucide-react";
+import { Upload, Inbox, BarChart3, Settings, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const links = [
   { href: "/upload", label: "Upload", icon: Upload },
   { href: "/inbox", label: "Inbox", icon: Inbox },
   { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Navbar() {
@@ -28,42 +30,45 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-b bg-white">
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4">
-        <Link href="/" className="text-lg font-bold tracking-tight">
+    <nav className="border-b bg-card">
+      <div className="mx-auto flex h-14 max-w-5xl items-center gap-2 sm:gap-6 px-4">
+        <Link href="/" className="text-base sm:text-lg font-bold tracking-tight shrink-0">
           Spend Radar
         </Link>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5 sm:gap-1">
           {links.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100",
+                "flex items-center gap-1.5 rounded-md px-2 sm:px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
                 pathname.startsWith(href)
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-500"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground"
               )}
             >
               <Icon className="h-4 w-4" />
-              {label}
+              <span className="hidden sm:inline">{label}</span>
             </Link>
           ))}
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-0.5">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="text-gray-500 hover:text-gray-900"
+            className="text-muted-foreground hover:text-foreground px-2 sm:px-3"
           >
             {signingOut ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
             ) : (
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="h-4 w-4 sm:mr-2" />
             )}
-            {signingOut ? "Signing out…" : "Sign out"}
+            <span className="hidden sm:inline">
+              {signingOut ? "Signing out..." : "Sign out"}
+            </span>
           </Button>
         </div>
       </div>

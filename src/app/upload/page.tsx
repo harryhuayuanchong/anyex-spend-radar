@@ -108,13 +108,13 @@ export default function UploadPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Upload Center</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Upload invoices, receipts, and bills for automatic extraction
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700">Document type:</span>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+        <span className="text-sm font-medium">Document type:</span>
         <Select value={sourceType} onValueChange={setSourceType}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -140,21 +140,23 @@ export default function UploadPage() {
       {documents.length > 0 &&
         documents.every((d) => d.status !== "processing" && d.status !== "uploaded") && (
           <Link href="/inbox">
-            <div className="group flex items-center gap-4 rounded-xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-5 transition-all hover:border-green-300 hover:shadow-md">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-green-900">
-                  All {documents.length} document{documents.length > 1 ? "s" : ""} processed
-                </p>
-                <p className="text-xs text-green-600">
-                  Review and manage your documents in the Inbox
-                </p>
+            <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-5 transition-all hover:border-green-300 hover:shadow-md">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
+                  <CheckCircle2 className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-green-900">
+                    All {documents.length} document{documents.length > 1 ? "s" : ""} processed
+                  </p>
+                  <p className="text-xs text-green-600">
+                    Review and manage your documents in the Inbox
+                  </p>
+                </div>
               </div>
               <Button
                 variant="outline"
-                className="border-green-300 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
+                className="border-green-300 bg-white text-green-700 hover:bg-green-50 hover:text-green-800 w-full sm:w-auto sm:ml-auto"
               >
                 <Inbox className="mr-2 h-4 w-4" />
                 Go to Inbox

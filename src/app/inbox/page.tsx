@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { DocumentCard } from "@/components/inbox/document-card";
@@ -63,6 +63,17 @@ export default function InboxPage() {
       : documents.filter((d) => d.status === statusFilter);
 
   const selected = documents.find((d) => d.id === selectedId);
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectDoc = useCallback((id: string) => {
+    setSelectedId(id);
+    // On mobile (single column), scroll to editor
+    if (window.innerWidth < 1024) {
+      setTimeout(() => {
+        editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, []);
 
   const handleDeleteRequest = useCallback(
     (id: string) => {
@@ -134,14 +145,14 @@ export default function InboxPage() {
                   key={doc.id}
                   document={doc}
                   selected={doc.id === selectedId}
-                  onClick={() => setSelectedId(doc.id)}
+                  onClick={() => handleSelectDoc(doc.id)}
                   onDelete={handleDeleteRequest}
                 />
               ))
             )}
           </div>
 
-          <div>
+          <div ref={editorRef}>
             {selected ? (
               <ExtractionEditor
                 key={selected.id}

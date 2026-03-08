@@ -24,7 +24,7 @@ export function VendorTable({ data }: VendorTableProps) {
       <CardHeader>
         <CardTitle className="text-sm">Top Vendors</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

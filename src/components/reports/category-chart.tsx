@@ -40,7 +40,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} layout="vertical" margin={{ left: 100 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
             <XAxis
               type="number"
               tickFormatter={(v) => formatCurrency(v)}
@@ -49,8 +49,9 @@ export function CategoryChart({ data }: CategoryChartProps) {
             <YAxis
               type="category"
               dataKey="category_name"
-              width={100}
-              fontSize={12}
+              width={80}
+              fontSize={11}
+              tickFormatter={(v: string) => v.length > 12 ? v.slice(0, 10) + "…" : v}
             />
             <Tooltip
               formatter={(value) => formatCurrency(Number(value))}

@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import type { DayBreakdown, DayExpenseItem } from "@/lib/types";
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS_SHORT = ["M", "T", "W", "T", "F", "S", "S"];
+const WEEKDAYS_FULL = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function heatClass(amount: number, max: number): string {
   if (amount === 0) return "bg-muted/50";
@@ -77,13 +78,14 @@ export function ExpenseCalendar({ month, byDay }: ExpenseCalendarProps) {
         <CardTitle className="text-base">Daily Spending</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1">
-          {WEEKDAYS.map((wd) => (
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+          {WEEKDAYS_FULL.map((wd, i) => (
             <div
               key={wd}
-              className="text-center text-xs font-medium text-muted-foreground py-1"
+              className="text-center text-[10px] sm:text-xs font-medium text-muted-foreground py-1"
             >
-              {wd}
+              <span className="hidden sm:inline">{wd}</span>
+              <span className="sm:hidden">{WEEKDAYS_SHORT[i]}</span>
             </div>
           ))}
 
@@ -94,23 +96,23 @@ export function ExpenseCalendar({ month, byDay }: ExpenseCalendarProps) {
           {days.map((d) => (
             <div
               key={d.day}
-              className={`group relative rounded-md p-1.5 text-center text-xs cursor-default ${heatClass(d.total, maxAmount)}`}
+              className={`group relative rounded sm:rounded-md p-1 sm:p-1.5 text-center text-[10px] sm:text-xs cursor-default ${heatClass(d.total, maxAmount)}`}
             >
               <div className="font-medium">{d.day}</div>
               {d.total > 0 && (
-                <div className="text-[10px] leading-tight truncate">
+                <div className="text-[9px] sm:text-[10px] leading-tight truncate">
                   {formatCurrency(d.total)}
                 </div>
               )}
 
               {d.items.length > 0 && (
-                <div className="invisible group-hover:visible absolute left-1/2 bottom-full mb-2 -translate-x-1/2 z-50 w-56 rounded-lg border bg-popover p-3 text-popover-foreground shadow-md">
+                <div className="invisible group-hover:visible absolute left-1/2 bottom-full mb-2 -translate-x-1/2 z-50 w-44 sm:w-56 rounded-lg border bg-popover p-2 sm:p-3 text-popover-foreground shadow-md">
                   <p className="mb-1.5 text-xs font-semibold text-left">
                     {month}-{String(d.day).padStart(2, "0")}
                   </p>
                   <ul className="space-y-1 text-left">
                     {d.items.map((item, i) => (
-                      <li key={i} className="flex items-center justify-between gap-2 text-xs">
+                      <li key={i} className="flex items-center justify-between gap-2 text-[11px] sm:text-xs">
                         <span className="truncate">{item.vendor}</span>
                         <span className="shrink-0 font-medium">{formatCurrency(item.amount)}</span>
                       </li>
