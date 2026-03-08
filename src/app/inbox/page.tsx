@@ -104,13 +104,13 @@ export default function InboxPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Inbox</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Review extracted data and fix any errors before posting
         </p>
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700">Filter:</span>
+        <span className="text-sm font-medium text-foreground">Filter:</span>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-36">
             <SelectValue />
@@ -125,18 +125,18 @@ export default function InboxPage() {
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/50 p-4 text-sm text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
 
       {loading ? (
-        <p className="py-8 text-center text-sm text-gray-400">Loading...</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">Loading...</p>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
           <div className="space-y-2">
             {filtered.length === 0 ? (
-              <p className="py-8 text-center text-sm text-gray-400">
+              <p className="py-8 text-center text-sm text-muted-foreground">
                 No documents found
               </p>
             ) : (
@@ -161,7 +161,7 @@ export default function InboxPage() {
                 onSaved={fetchDocuments}
               />
             ) : (
-              <div className="rounded-lg border border-dashed bg-white p-12 text-center text-sm text-gray-400">
+              <div className="rounded-lg border border-dashed bg-card p-12 text-center text-sm text-muted-foreground">
                 Select a document to edit
               </div>
             )}
@@ -178,13 +178,13 @@ export default function InboxPage() {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
             <DialogTitle className="text-center">Delete Document</DialogTitle>
             <DialogDescription className="text-center">
               This will permanently delete{" "}
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-foreground">
                 {deleteTarget?.filename}
               </span>{" "}
               along with its linked expense and storage file. This action cannot

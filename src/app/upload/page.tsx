@@ -132,7 +132,7 @@ export default function UploadPage() {
       <FileDropzone onFiles={handleFiles} />
 
       {uploading && (
-        <p className="text-center text-sm text-gray-500">Uploading...</p>
+        <p className="text-center text-sm text-muted-foreground">Uploading...</p>
       )}
 
       <UploadList documents={documents} />
@@ -140,23 +140,23 @@ export default function UploadPage() {
       {documents.length > 0 &&
         documents.every((d) => d.status !== "processing" && d.status !== "uploaded") && (
           <Link href="/inbox">
-            <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-5 transition-all hover:border-green-300 hover:shadow-md">
+            <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-xl border border-green-200 dark:border-green-800 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 p-4 sm:p-5 transition-all hover:border-green-300 dark:hover:border-green-700 hover:shadow-md">
               <div className="flex items-center gap-3 sm:gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-green-900">
+                  <p className="text-sm font-semibold text-green-900 dark:text-green-100">
                     All {documents.length} document{documents.length > 1 ? "s" : ""} processed
                   </p>
-                  <p className="text-xs text-green-600">
+                  <p className="text-xs text-green-600 dark:text-green-400">
                     Review and manage your documents in the Inbox
                   </p>
                 </div>
               </div>
               <Button
                 variant="outline"
-                className="border-green-300 bg-white text-green-700 hover:bg-green-50 hover:text-green-800 w-full sm:w-auto sm:ml-auto"
+                className="border-green-300 dark:border-green-700 bg-card text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/50 hover:text-green-800 w-full sm:w-auto sm:ml-auto"
               >
                 <Inbox className="mr-2 h-4 w-4" />
                 Go to Inbox

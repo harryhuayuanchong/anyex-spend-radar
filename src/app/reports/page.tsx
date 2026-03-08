@@ -40,7 +40,7 @@ export default function ReportsPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Monthly Report</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Spending breakdown and trends
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function ReportsPage() {
       </div>
 
       {loading ? (
-        <p className="py-12 text-center text-sm text-gray-400">Loading...</p>
+        <p className="py-12 text-center text-sm text-muted-foreground">Loading...</p>
       ) : report ? (
         <div className="space-y-6">
           <SummaryCards data={report} />
@@ -75,7 +75,7 @@ export default function ReportsPage() {
           <VendorTable data={report.top_vendors} />
         </div>
       ) : (
-        <p className="py-12 text-center text-sm text-gray-400">
+        <p className="py-12 text-center text-sm text-muted-foreground">
           No data available
         </p>
       )}

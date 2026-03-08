@@ -25,7 +25,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
           <CardTitle className="text-sm">Spending by Category</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="py-8 text-center text-sm text-gray-400">
+          <p className="py-8 text-center text-sm text-muted-foreground">
             No data for this month
           </p>
         </CardContent>

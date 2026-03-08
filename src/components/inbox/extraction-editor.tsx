@@ -91,7 +91,7 @@ export function ExtractionEditor({
   };
 
   return (
-    <div className="space-y-4 rounded-lg border bg-white p-6">
+    <div className="space-y-4 rounded-lg border bg-card p-6">
       <h3 className="font-semibold">Edit Extraction</h3>
 
       <div className="grid gap-4 sm:grid-cols-2">

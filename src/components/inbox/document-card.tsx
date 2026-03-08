@@ -26,12 +26,12 @@ export function DocumentCard({ document: doc, selected, onClick, onDelete }: Doc
   return (
     <div
       onClick={onClick}
-      className={`w-full cursor-pointer text-left rounded-lg border p-4 transition-colors hover:bg-gray-50 ${
-        selected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"
+      className={`w-full cursor-pointer text-left rounded-lg border p-4 transition-colors hover:bg-accent ${
+        selected ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30" : "border-border bg-card"
       }`}
     >
       <div className="flex items-start gap-3">
-        <FileText className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" />
+        <FileText className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-sm font-medium">{doc.filename}</p>
@@ -40,7 +40,7 @@ export function DocumentCard({ document: doc, selected, onClick, onDelete }: Doc
             </Badge>
           </div>
           {extracted && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               <span className="font-medium">{extracted.vendor}</span>
               {" — "}
               {formatCurrency(extracted.amount, extracted.currency)}
@@ -49,9 +49,9 @@ export function DocumentCard({ document: doc, selected, onClick, onDelete }: Doc
             </div>
           )}
           {doc.error_message && (
-            <p className="text-xs text-red-500">{doc.error_message}</p>
+            <p className="text-xs text-red-500 dark:text-red-400">{doc.error_message}</p>
           )}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {formatDate(doc.created_at)}
           </p>
         </div>
@@ -60,7 +60,7 @@ export function DocumentCard({ document: doc, selected, onClick, onDelete }: Doc
             e.stopPropagation();
             onDelete(doc.id);
           }}
-          className="shrink-0 rounded p-1 text-gray-300 hover:bg-red-50 hover:text-red-500 transition-colors"
+          className="shrink-0 rounded p-1 text-muted-foreground/50 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-500 dark:hover:text-red-400 transition-colors"
           title="Delete document"
         >
           <Trash2 className="h-4 w-4" />

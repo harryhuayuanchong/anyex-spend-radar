@@ -41,20 +41,20 @@ export function FileDropzone({ onFiles }: FileDropzoneProps) {
       className={cn(
         "flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-6 sm:p-10 transition-colors",
         dragOver
-          ? "border-blue-500 bg-blue-50"
-          : "border-gray-300 hover:border-gray-400"
+          ? "border-blue-500 bg-blue-50 dark:bg-blue-950/50"
+          : "border-border hover:border-muted-foreground/50"
       )}
     >
-      <Upload className="h-8 w-8 text-gray-400" />
+      <Upload className="h-8 w-8 text-muted-foreground" />
       <div className="text-center">
-        <p className="text-sm font-medium text-gray-700">
+        <p className="text-sm font-medium text-foreground">
           Drop files here or click to browse
         </p>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           PDF, PNG, JPG, JPEG — invoices, receipts, bills
         </p>
       </div>
-      <div className="flex gap-2 text-xs text-gray-400">
+      <div className="flex gap-2 text-xs text-muted-foreground">
         <FileText className="h-4 w-4" /> PDF
         <ImageIcon className="h-4 w-4 ml-2" /> Images
       </div>

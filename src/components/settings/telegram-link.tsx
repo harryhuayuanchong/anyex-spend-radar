@@ -45,7 +45,7 @@ export function TelegramLink() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border p-4 text-sm text-gray-500">
+      <div className="rounded-lg border p-4 text-sm text-muted-foreground">
         Loading...
       </div>
     );
@@ -58,12 +58,12 @@ export function TelegramLink() {
           <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
           <span className="text-sm font-medium">Connected</span>
           {status.telegram_username && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               @{status.telegram_username}
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground">
           Linked at {new Date(status.linked_at!).toLocaleString()}
         </p>
         <Button variant="outline" size="sm" onClick={unlinkTelegram}>
@@ -75,7 +75,7 @@ export function TelegramLink() {
 
   return (
     <div className="rounded-lg border p-4 space-y-3">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-muted-foreground">
         Connect your Telegram to receive payment reminders and query expenses.
       </p>
 
@@ -89,7 +89,7 @@ export function TelegramLink() {
           >
             Open in Telegram
           </a>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Click the link above, then press Start in Telegram to complete binding.
           </p>
         </div>

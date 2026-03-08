@@ -97,7 +97,7 @@ export default function SettingsPage() {
         )}
 
         {loading ? (
-          <p className="text-sm text-gray-500">Loading...</p>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         ) : (
           <ReminderList
             reminders={reminders}

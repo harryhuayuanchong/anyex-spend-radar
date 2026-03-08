@@ -42,7 +42,7 @@ interface UploadListProps {
 export function UploadList({ documents }: UploadListProps) {
   if (documents.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-gray-400">
+      <p className="py-8 text-center text-sm text-muted-foreground">
         No documents uploaded yet
       </p>
     );
@@ -55,9 +55,9 @@ export function UploadList({ documents }: UploadListProps) {
         return (
           <div
             key={doc.id}
-            className="flex items-center gap-3 rounded-md border bg-white px-4 py-3"
+            className="flex items-center gap-3 rounded-md border bg-card px-4 py-3"
           >
-            <FileText className="h-5 w-5 shrink-0 text-gray-400" />
+            <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{doc.filename}</p>
               {doc.error_message && (

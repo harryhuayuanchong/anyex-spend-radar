@@ -22,7 +22,7 @@ interface ReminderListProps {
 export function ReminderList({ reminders, onDelete, onToggle }: ReminderListProps) {
   if (reminders.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-muted-foreground">
         No payment reminders set. Add one to get notified on due dates.
       </p>
     );
@@ -41,12 +41,12 @@ export function ReminderList({ reminders, onDelete, onToggle }: ReminderListProp
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{r.vendor}</span>
               {r.category?.name && (
-                <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
                   {r.category.name}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Due: {r.due_day}th of every month
               {r.amount ? ` · $${Number(r.amount).toFixed(2)} ${r.currency}` : ""}
             </p>
@@ -64,7 +64,7 @@ export function ReminderList({ reminders, onDelete, onToggle }: ReminderListProp
               variant="ghost"
               size="sm"
               onClick={() => onDelete(r.id)}
-              className="text-gray-400 hover:text-red-500"
+              className="text-muted-foreground hover:text-red-500 dark:hover:text-red-400"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
