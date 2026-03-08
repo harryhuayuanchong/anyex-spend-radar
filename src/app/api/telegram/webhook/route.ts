@@ -12,12 +12,12 @@ export async function POST(request: NextRequest) {
   const update: TelegramUpdate = await request.json();
 
   if (update.message?.text) {
-    // Fire-and-forget: don't block Telegram's webhook
-    handleCommand(update.message).catch((err) =>
-      console.error("[TG Webhook] Command error:", err)
-    );
+    try {
+      await handleCommand(update.message);
+    } catch (err) {
+      console.error("[TG Webhook] Command error:", err);
+    }
   }
 
-  // Always respond 200 to Telegram
   return NextResponse.json({ ok: true });
 }
