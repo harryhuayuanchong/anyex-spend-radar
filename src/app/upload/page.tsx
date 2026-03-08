@@ -89,12 +89,35 @@ export default function UploadPage() {
           toast.success(`Uploaded ${file.name}`);
 
           // Auto-trigger processing
-          fetch(`/api/documents/${doc.id}/process`, { method: "POST" });
           setDocuments((prev) =>
             prev.map((d) =>
               d.id === doc.id ? { ...d, status: "processing" } : d
             )
           );
+          // Await the processing to completion (the API now awaits the pipeline)
+          fetch(`/api/documents/${doc.id}/process`, { method: "POST" })
+            .then(async (processRes) => {
+              if (processRes.ok) {
+                // Fetch updated document to get extracted data
+                const updatedRes = await fetch(`/api/documents/${doc.id}`);
+                if (updatedRes.ok) {
+                  const updated: Document = await updatedRes.json();
+                  setDocuments((prev) =>
+                    prev.map((d) => (d.id === doc.id ? updated : d))
+                  );
+                  if (updated.status === "posted") {
+                    toast.success(`${file.name} processed & posted`);
+                  } else if (updated.status === "extracted") {
+                    toast.success(`${file.name} extracted — review in Inbox`);
+                  } else if (updated.status === "error") {
+                    toast.error(`${file.name}: ${updated.error_message}`);
+                  }
+                }
+              }
+            })
+            .catch(() => {
+              toast.error(`Processing failed for ${file.name}`);
+            });
         } catch {
           toast.error(`Failed to upload ${file.name}`);
         }

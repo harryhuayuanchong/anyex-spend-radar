@@ -7,6 +7,19 @@ function getOpenAI() {
   return _openai;
 }
 
+/**
+ * Download an image/PDF from a URL and return a base64 data URL.
+ * This is more reliable than passing external URLs to OpenAI,
+ * which may fail due to CORS, auth, or bucket configuration issues.
+ */
+async function toBase64DataUrl(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download file: ${res.statusText}`);
+  const contentType = res.headers.get("content-type") || "image/png";
+  const buffer = Buffer.from(await res.arrayBuffer());
+  return `data:${contentType};base64,${buffer.toString("base64")}`;
+}
+
 const SYSTEM_PROMPT = `You are a document data extractor. Given an image of an invoice, receipt, or bill, extract the following fields as JSON:
 {
   "vendor": "Company/merchant name",
@@ -65,6 +78,9 @@ Return ONLY valid JSON. If a field is not found, omit it (except vendor, date, a
 export async function extractFromVision(
   imageUrl: string
 ): Promise<ExtractedData> {
+  // Download and convert to base64 to avoid OpenAI URL-fetch failures
+  const dataUrl = await toBase64DataUrl(imageUrl);
+
   const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -74,7 +90,7 @@ export async function extractFromVision(
         content: [
           {
             type: "image_url",
-            image_url: { url: imageUrl, detail: "high" },
+            image_url: { url: dataUrl, detail: "high" },
           },
         ],
       },

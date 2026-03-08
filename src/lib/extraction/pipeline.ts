@@ -14,6 +14,25 @@ function isPdf(filename: string) {
   return filename.toLowerCase().endsWith(".pdf");
 }
 
+/**
+ * Strip null bytes and control characters that PostgreSQL cannot store.
+ */
+function sanitizeForDb(value: string): string {
+  let result = "";
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    if (code === 0 || (code < 32 && code !== 9 && code !== 10 && code !== 13)) {
+      continue;
+    }
+    result += value[i];
+  }
+  return result;
+}
+
+function sanitizeExtractedData<T>(data: T): T {
+  return JSON.parse(sanitizeForDb(JSON.stringify(data)));
+}
+
 const STRIPE_FILENAME_RE = /^(Invoice|Receipt)-[A-Z0-9]+-\d+/i;
 const STRIPE_TEXT_MARKERS = [
   "Pay online",
@@ -56,10 +75,22 @@ export async function processDocument(docId: string, userId: string) {
     let extracted: ExtractedData;
     let extractedText: string | null = null;
 
+    // Track whether the text-based path already validated successfully
+    let alreadyValidated = false;
+
     if (isPdf(document.filename)) {
       // PDF: try text extraction first
-      const text = await extractTextFromPdf(document.file_url);
-      extractedText = text;
+      let text = "";
+      try {
+        text = await extractTextFromPdf(document.file_url);
+        extractedText = text;
+      } catch (pdfErr) {
+        console.warn(
+          `PDF text extraction failed for ${document.filename}, falling back to vision:`,
+          pdfErr
+        );
+        // Will fall through to vision path below since text is ""
+      }
 
       if (text.length > 50) {
         const stripe = isStripeDocument(text, document.filename);
@@ -88,13 +119,23 @@ export async function processDocument(docId: string, userId: string) {
           parseResult = extractedDataSchema.safeParse(extracted);
         }
 
+        // Step 4: if vision also invalid, retry vision once
+        if (!parseResult.success) {
+          console.warn(
+            `Vision extraction invalid for ${document.filename}, retrying vision...`
+          );
+          extracted = await extractFromVision(document.file_url);
+          parseResult = extractedDataSchema.safeParse(extracted);
+        }
+
         if (!parseResult.success) {
           throw new Error(
             `Extraction failed after all attempts: ${parseResult.error.message}`
           );
         }
+        alreadyValidated = true;
       } else {
-        // Scanned PDF — fall back to vision
+        // Scanned PDF or text extraction failed — fall back to vision
         extracted = await extractFromVision(document.file_url);
       }
     } else {
@@ -102,20 +143,39 @@ export async function processDocument(docId: string, userId: string) {
       extracted = await extractFromVision(document.file_url);
     }
 
-    // Validate with zod
+    // Validate vision-only results (images & scanned PDFs) with retry
+    if (!alreadyValidated) {
+      const visionParseResult = extractedDataSchema.safeParse(extracted);
+      if (!visionParseResult.success) {
+        console.warn(
+          `Vision extraction invalid for ${document.filename}, retrying...`
+        );
+        extracted = await extractFromVision(document.file_url);
+      }
+    }
+
+    // Final validation — throws if still invalid
     const validated = extractedDataSchema.parse(extracted);
 
+    // Sanitize data for PostgreSQL (strip null bytes that jsonb cannot store)
+    const sanitizedJson = sanitizeExtractedData(validated);
+    const sanitizedText = extractedText ? sanitizeForDb(extractedText) : null;
+
     // Save extraction results
-    await supabase
+    const { error: saveError } = await supabase
       .from("documents")
       .update({
         status: "extracted",
-        extracted_json: validated,
-        extracted_text: extractedText,
+        extracted_json: sanitizedJson,
+        extracted_text: sanitizedText,
         updated_at: new Date().toISOString(),
       })
       .eq("id", docId)
       .eq("user_id", userId);
+
+    if (saveError) {
+      throw new Error(`Failed to save extraction results: ${saveError.message}`);
+    }
 
     // Auto-categorize and create expense
     try {

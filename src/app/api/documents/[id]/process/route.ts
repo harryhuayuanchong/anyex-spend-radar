@@ -5,6 +5,8 @@ import { processDocument } from "@/lib/extraction/pipeline";
 import { categorizeAndPost } from "@/lib/categorization/categorizer";
 import type { ExtractedData } from "@/lib/types";
 
+export const maxDuration = 60; // Allow up to 60s for extraction
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
@@ -25,7 +27,7 @@ export async function POST(
 
   if (body.skip_extraction) {
     // Manual post: read existing extracted_json, categorize with override
-    const manualPost = async () => {
+    try {
       const { data: doc } = await supabase
         .from("documents")
         .select("extracted_json")
@@ -72,17 +74,24 @@ export async function POST(
       } else {
         await categorizeAndPost(id, extracted, userId);
       }
-    };
 
-    manualPost().catch((err) =>
-      console.error("Manual post failed:", err)
-    );
+      return NextResponse.json({ status: "posted" });
+    } catch (err) {
+      console.error("Manual post failed:", err);
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Manual post failed" },
+        { status: 500 }
+      );
+    }
   } else {
-    // Normal: full extraction pipeline
-    processDocument(id, userId).catch((err) =>
-      console.error("Background processing failed:", err)
-    );
+    // Normal: full extraction pipeline — await it instead of fire-and-forget
+    // so the serverless function stays alive until processing completes
+    try {
+      await processDocument(id, userId);
+      return NextResponse.json({ status: "completed" });
+    } catch (err) {
+      console.error("Processing failed:", err);
+      return NextResponse.json({ status: "error" });
+    }
   }
-
-  return NextResponse.json({ status: "processing" });
 }
