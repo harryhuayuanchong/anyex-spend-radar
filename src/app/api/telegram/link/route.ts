@@ -11,18 +11,18 @@ export async function POST() {
 
   const token = `sr_${randomBytes(16).toString("hex")}`;
 
-  // Upsert: if user already has a row, refresh token
+  // Delete existing row first, then insert fresh
+  await supabase
+    .from("telegram_links")
+    .delete()
+    .eq("user_id", userId);
+
   const { data, error } = await supabase
     .from("telegram_links")
-    .upsert(
-      {
-        user_id: userId,
-        link_token: token,
-        linked_at: null,
-        telegram_chat_id: 0, // placeholder, will be set on link
-      },
-      { onConflict: "user_id" }
-    )
+    .insert({
+      user_id: userId,
+      link_token: token,
+    })
     .select()
     .single();
 

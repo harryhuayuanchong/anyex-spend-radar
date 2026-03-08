@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
@@ -15,17 +15,29 @@ export function TelegramLink() {
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchStatus = useCallback(async () => {
+    const res = await fetch("/api/telegram/link");
+    if (res.ok) {
+      const data = await res.json();
+      setStatus(data);
+      // Stop polling once linked
+      if (data.linked && pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+        setLinkUrl(null);
+      }
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchStatus();
-  }, []);
-
-  async function fetchStatus() {
-    setLoading(true);
-    const res = await fetch("/api/telegram/link");
-    if (res.ok) setStatus(await res.json());
-    setLoading(false);
-  }
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [fetchStatus]);
 
   async function generateLink() {
     setGenerating(true);
@@ -33,6 +45,9 @@ export function TelegramLink() {
     if (res.ok) {
       const data = await res.json();
       setLinkUrl(data.link_url);
+      // Poll every 3s to detect when user completes binding in Telegram
+      if (pollRef.current) clearInterval(pollRef.current);
+      pollRef.current = setInterval(fetchStatus, 3000);
     }
     setGenerating(false);
   }
